@@ -136,7 +136,7 @@ def octoshop(my_upload, meta_prompt):
 
 st.set_page_config(layout="wide", page_title="OctoShop")
 
-st.write("## OctoShop - A re:invent demo powered by OctoAI")
+st.write("## OctoShop - Powered by OctoAI")
 st.write("\n\n")
 st.write("### Transform photos with words!")
 
