@@ -1,0 +1,9 @@
+# streamlit==1.24.1
+streamlit-chat==0.1.1
+streamlit-image-select==0.6.0
+webuiapi==0.9.4
+Pillow==9.5.0
+numpy==1.24.4
+uvicorn==0.22.0
+octoai-sdk==0.7.0
+opencv-python==4.8.0.74
