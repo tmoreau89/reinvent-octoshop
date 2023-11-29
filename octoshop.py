@@ -3,7 +3,6 @@ from octoai.client import Client
 from octoai.errors import OctoAIClientError, OctoAIServerError
 from io import BytesIO
 from base64 import b64encode, b64decode
-import requests
 from PIL import Image, ExifTags
 import os
 import time
@@ -39,7 +38,6 @@ def rotate_image(image):
 
 def rescale_image(image):
     w, h = image.size
-    print("width {}, height {}".format(w, h))
 
     if w == h:
         return image.resize((1024, 1024))
@@ -67,21 +65,16 @@ def octoshop(my_upload, meta_prompt):
     try:
         start = time.time()
 
-        # UI columps
-        colI, colO = st.columns(2)
-
         # Rotate image and perform some rescaling
         input_img = Image.open(my_upload)
         input_img = rotate_image(input_img)
         input_img = rescale_image(input_img)
-        colI.write("Input image")
-        colI.image(input_img)
         progress_text = "OctoShopping in action..."
         percent_complete = 0
-        progress_bar = colO.progress(percent_complete, text=progress_text)
+        progress_bar = st.progress(percent_complete, text=progress_text)
 
         # Number of images generated
-        num_imgs = 1
+        num_imgs = 4
         octoshop_futures = {}
         for idx in range(num_imgs):
             # Query endpoint async
@@ -118,26 +111,29 @@ def octoshop(my_upload, meta_prompt):
         # Process results
         end = time.time()
         progress_bar.empty()
-        colO.write("OctoShopped images in {:.2f}s :star2:".format(end-start))
+        st.write("OctoShopped images in {:.2f}s :star2:".format(end-start))
+        col0, col1 = st.columns(2)
         for idx in range(num_imgs):
             results = oai_client.get_future_result(octoshop_futures[idx])
             octoshopped_image = Image.open(BytesIO(b64decode(results["images"][0])))
-            if idx == 0:
-                colI.text_area("CLIP Interrogator sees:", value=results["clip"])
-            colO.image(octoshopped_image)
-            colO.text_area("Llama2 describes:", value=results["story"])
+            if idx % 2 == 0:
+                col0.image(octoshopped_image)
+                col0.text_area("Llama2 describes:", value=results["story"])
+            elif idx % 2 == 1:
+                col1.image(octoshopped_image)
+                col1.text_area("Llama2 describes:", value=results["story"])
 
     except OctoAIClientError as e:
         progress_bar.empty()
-        colO.write("Oops something went wrong (client error)!")
+        st.write("Oops something went wrong (client error)!")
 
     except OctoAIServerError as e:
         progress_bar.empty()
-        colO.write("Oops something went wrong (server error)")
+        st.write("Oops something went wrong (server error)")
 
     except Exception as e:
         progress_bar.empty()
-        colO.write("Oops something went wrong (unexpected error)!")
+        st.write("Oops something went wrong (unexpected error)!")
 
 
 st.set_page_config(layout="wide", page_title="OctoShop")
