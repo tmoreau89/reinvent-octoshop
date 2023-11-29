@@ -39,22 +39,28 @@ def rotate_image(image):
 
 def rescale_image(image):
     w, h = image.size
+    print("width {}, height {}".format(w, h))
 
-    if w > h:
-        new_width = new_height = h
+    if w == h:
+        return image.resize((1024, 1024))
     else:
-        new_width = new_height = w
+        if w > h:
+            new_height = h
+            new_width = int(h * 1216 / 832 )
+        else:
+            new_width = w
+            new_height = int(w * 1216 / 832)
 
-    left = (w - new_width)/2
-    top = (h - new_height)/2
-    right = (w + new_width)/2
-    bottom = (h + new_height)/2
+        left = (w - new_width)/2
+        top = (h - new_height)/2
+        right = (w + new_width)/2
+        bottom = (h + new_height)/2
+        image = image.crop((left, top, right, bottom))
 
-    image = image.crop((left, top, right, bottom))
-
-    image = image.resize((1024, 1024))
-    return image
-
+        if w > h:
+            return image.resize((1216, 832))
+        else:
+            return image.resize((832, 1216))
 
 def octoshop(my_upload, meta_prompt):
     # Wrap all of this in a try block
@@ -117,9 +123,9 @@ def octoshop(my_upload, meta_prompt):
             results = oai_client.get_future_result(octoshop_futures[idx])
             octoshopped_image = Image.open(BytesIO(b64decode(results["images"][0])))
             if idx == 0:
-                colI.text_area("", value=results["clip"])
+                colI.text_area("CLIP Interrogator sees:", value=results["clip"])
             colO.image(octoshopped_image)
-            colO.text_area("", value=results["story"])
+            colO.text_area("Llama2 describes:", value=results["story"])
 
     except OctoAIClientError as e:
         progress_bar.empty()
@@ -142,7 +148,8 @@ st.write("### Transform photos with words!")
 
 meta_prompt = st.text_input("Transformation Prompt", value="Set in 50s Las Vegas")
 
-my_upload = st.camera_input("Take a snap")
+my_upload = st.file_uploader("Take a snap or upload a photo", type=["png", "jpg", "jpeg"])
 
 if my_upload is not None:
-    octoshop(my_upload, meta_prompt)
+    if st.button('OctoShop!'):
+        octoshop(my_upload, meta_prompt)
