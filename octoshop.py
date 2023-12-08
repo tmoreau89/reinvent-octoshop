@@ -136,13 +136,14 @@ def octoshop(my_upload, meta_prompt):
         st.write("Oops something went wrong (unexpected error)!")
 
 
-st.set_page_config(layout="wide", page_title="OctoShop")
+st.set_page_config(layout="wide", page_title="OctoShop - Holiday edition")
 
-st.write("## OctoShop - Powered by OctoAI")
+st.write("## Ugly xmas sweater generator")
 st.write("\n\n")
-st.write("### Transform photos with words!")
+st.write("### For OctoML internal use only! Something fun to play with ahead of the holidays...")
 
-meta_prompt = st.text_input("Transformation Prompt", value="Set in 50s Las Vegas")
+# meta_prompt = st.text_input("Transformation Prompt", value="Set in 50s Las Vegas")
+meta_prompt = "set in an ugly christmas sweater competition"
 
 my_upload = st.file_uploader("Take a snap or upload a photo", type=["png", "jpg", "jpeg"])
 
